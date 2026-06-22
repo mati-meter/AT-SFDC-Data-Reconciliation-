@@ -1,0 +1,15 @@
+# Generated reconciliation outputs
+job_diffs.md
+runs/
+
+# Notebook cruft
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secrets
+.env
