@@ -41,6 +41,22 @@ export AIRTABLE_ENTERPRISE_ACCOUNT_ID="entXXXXXXXX"
 The business rules (excluded accounts/statuses, non-focused job types, Prime account) live in one
 config cell so they can be adjusted when the report definition changes.
 
+## Over-time tracking (point-in-time → diff → persist → attribute)
+
+The notebook runs point-in-time but keeps a cheap history so you never need a full-base scan:
+
+1. **Reconcile + diff** — per run (Sections 5–6), writing `job_diffs.md`.
+2. **Persist** (Section 7) — appends the Adjusted-for-Prime metrics + diff counts to
+   `runs/run_history.csv` (the trend line) and snapshots the differing job IDs to
+   `runs/diffs_<timestamp>.json`.
+3. **Sticky diffs** — jobs that differ in two consecutive runs. Transient sync lag clears itself
+   between runs; sticky diffs are genuine drift.
+4. **Attribute** (Section 8) — the Airtable **audit log** is queried *only* for sticky diffs, to
+   see which system moved and when. Requires `AIRTABLE_ENTERPRISE_ACCOUNT_ID`.
+
+`.env` is auto-loaded (no `python-dotenv` required). `runs/` and `job_diffs.md` are gitignored —
+they're local run state.
+
 ## Identifiers
 
 - Base: `Command Context Sync` (`app7jMwevErzRNk7G`)
