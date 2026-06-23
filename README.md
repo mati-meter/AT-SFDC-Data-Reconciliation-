@@ -31,8 +31,10 @@ export AIRTABLE_ENTERPRISE_ACCOUNT_ID="entXXXXXXXX"
 
 ## How it reconciles
 
-- **Join key:** SFDC `Job Name` (`JOB-xxxx`) ⇄ Airtable `new_sfdc_job_sync` — the direct sync
-  field, not the derived `18char Job ID Rollup`.
+- **Join (dual-key):** a SFDC row matches if **either** the 18-char Job ID matches AT
+  `18char Job ID Rollup` **or** the `Job Name` matches AT `new_sfdc_job_sync` (id first, Job Name
+  fallback) — a stale/blank key on one side doesn't drop the match. `diff_detail` records which key
+  matched.
 - **Diff output:** `diffs_df` — the differing rows in the **same shape as the input CSV** (identical
   columns) → `runs/sfdc_diffs.csv`; plus a long-format `diff_detail` and the bulleted `job_diffs.md`.
 - **Measures (per filter combination):** distinct Customers, distinct Locations, Rows/Site
