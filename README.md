@@ -31,7 +31,10 @@ export AIRTABLE_ENTERPRISE_ACCOUNT_ID="entXXXXXXXX"
 
 ## How it reconciles
 
-- **Join key:** SFDC `18char Job ID` ⇄ Airtable `18char Job ID Rollup (from new_sfdc_job_sync)`.
+- **Join key:** SFDC `Job Name` (`JOB-xxxx`) ⇄ Airtable `new_sfdc_job_sync` — the direct sync
+  field, not the derived `18char Job ID Rollup`.
+- **Diff output:** `diffs_df` — the differing rows in the **same shape as the input CSV** (identical
+  columns) → `runs/sfdc_diffs.csv`; plus a long-format `diff_detail` and the bulleted `job_diffs.md`.
 - **Measures (per filter combination):** distinct Customers, distinct Locations, Rows/Site
   Services, distinct Jobs, summed Sq Ft.
 - **Filter dimensions** (composable, see the predicate table in the notebook): Status
