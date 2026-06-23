@@ -51,8 +51,10 @@ The notebook runs point-in-time but keeps a cheap history so you never need a fu
    `runs/diffs_<timestamp>.json`.
 3. **Sticky diffs** — jobs that differ in two consecutive runs. Transient sync lag clears itself
    between runs; sticky diffs are genuine drift.
-4. **Attribute** (Section 8) — the Airtable **audit log** is queried *only* for sticky diffs, to
-   see which system moved and when. Requires `AIRTABLE_ENTERPRISE_ACCOUNT_ID`.
+4. **Attribute** (Section 8) — the Airtable **`changeEvents`** feed (cell-level before/after,
+   ~14-day retention) is polled + persisted to `runs/change_events.jsonl` with a saved cursor,
+   then read *only* for sticky diffs to see which system moved, when, and by whom. Requires
+   `AIRTABLE_ENTERPRISE_ACCOUNT_ID`. (This is the transition-log substrate, not the audit log.)
 
 `.env` is auto-loaded (no `python-dotenv` required). `runs/` and `job_diffs.md` are gitignored —
 they're local run state.
