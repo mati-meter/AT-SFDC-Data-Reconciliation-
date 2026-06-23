@@ -52,12 +52,26 @@ The notebook runs point-in-time but keeps a cheap history so you never need a fu
 3. **Sticky diffs** — jobs that differ in two consecutive runs. Transient sync lag clears itself
    between runs; sticky diffs are genuine drift.
 4. **Attribute** (Section 8) — the Airtable **`changeEvents`** feed (cell-level before/after,
-   ~14-day retention) is polled + persisted to `runs/change_events.jsonl` with a saved cursor,
-   then read *only* for sticky diffs to see which system moved, when, and by whom. Requires
-   `AIRTABLE_ENTERPRISE_ACCOUNT_ID`. (This is the transition-log substrate, not the audit log.)
+   ~14-day retention, cursor pagination) is polled + persisted to `runs/change_events.jsonl` with a
+   saved cursor, then read *only* for sticky diffs to see which system moved, when, and by whom.
+   Requires `AIRTABLE_ENTERPRISE_ACCOUNT_ID`. (Transition-log substrate — not the audit log.)
 
 `.env` is auto-loaded (no `python-dotenv` required). `runs/` and `job_diffs.md` are gitignored —
 they're local run state.
+
+## Planning artifacts
+
+Shared loaders + business rules live in `recon_lib.py` (one source of truth for field IDs), used by:
+
+| File | Purpose |
+|---|---|
+| `countdown_and_crosswalk.ipynb` | **A** — countdown / feasibility baseline (backlog vs. required rate, target-date schedule, trailing velocity + gap). **B** — `dim_site` crosswalk (conformed SFDC↔AT site key → `runs/dim_site.csv`). |
+| `planning_analyses.ipynb` | Backlog concentration (Pareto), readiness-gate proxy, schedule slippage, sqft-weighted risk, cross-system drift-by-field, diff aging. |
+| `make_findings.py` | Regenerates `FINDINGS.md` — a one-page summary of the above — from the current CSV (`python make_findings.py [csv]`). |
+| `FINDINGS.md` | Generated summary snapshot. |
+
+SFDC-side cells run from the CSV alone; Airtable-dependent cells (velocity, crosswalk match rate,
+drift) populate once `AIRTABLE_API_TOKEN` is in `.env`.
 
 ## Identifiers
 
